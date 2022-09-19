@@ -707,6 +707,13 @@ instance.asFiles("path/to/thumbnail");
 			}
 		}
 
+		public FileCallback<T> callback = null;
+
+		interface FileCallback<E> {
+			void start(E source);
+			void end(E source);
+		}
+
 		/**
 		 * Map to keep track of whether a property has been properly set or not.
 		 */
@@ -2294,31 +2301,42 @@ watermark(Positions.CENTER, image, opacity);
 			List<File> destinationFiles = new ArrayList<File>();
 			
 			Iterator<File> filenameIter = iterable.iterator();
-			
+
 			for (ImageSource<T> source : sources) {
 				if (!filenameIter.hasNext()) {
 					throw new IndexOutOfBoundsException(
 							"Not enough file names provided by iterator."
 					);
 				}
-				
+
 				ThumbnailParameter param = makeParam();
-				
+
 				FileImageSink destination = new FileImageSink(filenameIter.next(), allowOverwrite);
-				
+
 				try {
+					if (this.callback != null) {
+						this.callback.start(source.getSource());
+					}
+
 					Thumbnailator.createThumbnail(
 							new SourceSinkThumbnailTask<T, File>(param, source, destination)
 					);
-					
+
 					destinationFiles.add(destination.getSink());
 
+					if (this.callback != null) {
+						this.callback.end(source.getSource());
+					}
 				} catch (IllegalArgumentException e) {
 					/*
 					 * Handle the IllegalArgumentException which is thrown when
 					 * the destination file already exists by not adding the
 					 * current file to the destinationFiles list.
 					 */
+
+					if (this.callback != null) {
+						this.callback.end(source.getSource());
+					}
 				}
 			}
 			
@@ -2430,34 +2448,45 @@ watermark(Positions.CENTER, image, opacity);
 			}
 
 			List<File> destinationFiles = new ArrayList<File>();
-			
+
 			for (ImageSource<T> source : sources) {
 				if (!(source instanceof FileImageSource)) {
 					throw new IllegalStateException("Cannot create thumbnails to files if original images are not from files.");
 				}
-				
+
 				ThumbnailParameter param = makeParam();
-				
+
 				File f = ((FileImageSource)source).getSource();
-				
+
 				File actualDestDir = destinationDir == null ? f.getParentFile() : destinationDir;
 				File destinationFile = new File(actualDestDir, rename.apply(f.getName(), param));
-				
+
 				FileImageSink destination = new FileImageSink(destinationFile, allowOverwrite);
-				
+
 				try {
+					if (this.callback != null) {
+						this.callback.start(source.getSource());
+					}
+
 					Thumbnailator.createThumbnail(
 							new SourceSinkThumbnailTask<T, File>(param, source, destination)
 					);
-					
+
 					destinationFiles.add(destination.getSink());
 
+					if (this.callback != null) {
+						this.callback.end(source.getSource());
+					}
 				} catch (IllegalArgumentException e) {
 					/*
 					 * Handle the IllegalArgumentException which is thrown when
 					 * the destination file already exists by not adding the
 					 * current file to the destinationFiles list.
 					 */
+
+					if (this.callback != null) {
+						this.callback.end(source.getSource());
+					}
 				}
 			}
 			
