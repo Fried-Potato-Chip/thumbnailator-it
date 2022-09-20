@@ -707,9 +707,9 @@ instance.asFiles("path/to/thumbnail");
 			}
 		}
 
-		public FileCallback<T> callback = null;
+		public AsListLoopCallback<T> callback = null;
 
-		public interface FileCallback<E> {
+		public interface AsListLoopCallback<E> {
 			void start(E source);
 			void end(E source);
 			boolean forceEnd(E source);
