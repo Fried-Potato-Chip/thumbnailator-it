@@ -712,6 +712,7 @@ instance.asFiles("path/to/thumbnail");
 		public interface FileCallback<E> {
 			void start(E source);
 			void end(E source);
+			boolean forceEnd(E source);
 		}
 
 		/**
@@ -2338,6 +2339,10 @@ watermark(Positions.CENTER, image, opacity);
 						this.callback.end(source.getSource());
 					}
 				}
+
+				if (this.callback != null && this.callback.forceEnd(source.getSource())) {
+					break;
+				}
 			}
 			
 			return destinationFiles;
@@ -2487,6 +2492,10 @@ watermark(Positions.CENTER, image, opacity);
 					if (this.callback != null) {
 						this.callback.end(source.getSource());
 					}
+				}
+
+				if (this.callback != null && this.callback.forceEnd(source.getSource())) {
+					break;
 				}
 			}
 			
