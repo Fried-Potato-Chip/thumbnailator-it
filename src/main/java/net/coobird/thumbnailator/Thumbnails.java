@@ -709,7 +709,7 @@ instance.asFiles("path/to/thumbnail");
 
 		public FileCallback<T> callback = null;
 
-		interface FileCallback<E> {
+		public interface FileCallback<E> {
 			void start(E source);
 			void end(E source);
 		}
